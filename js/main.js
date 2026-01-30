@@ -4,26 +4,42 @@
    Ditulis rapi & mudah dikembangkan
 ================================================== */
 
-document.addEventListener("DOMContentLoaded", function () {
+// Fungsi untuk load partial HTML (header/footer)
+const loadPartial = async (id, file) => {
+    const target = document.getElementById(id);
+    if (!target) {
+        console.warn(`Elemen #${id} tidak ditemukan`);
+        return;
+    }
 
-    /* ===============================================
-       1. ACTIVE NAVIGATION (AUTO DETECT PAGE)
-       Menandai menu sesuai halaman aktif
-    =============================================== */
-    const navLinks = document.querySelectorAll(".nav-links a");
-    const currentPath = window.location.pathname.split("/").pop();
+    try {
+        const res = await fetch(file);
+        const html = await res.text();
+        target.innerHTML = html;
+    } catch (err) {
+        console.error(err);
+    }
+};
 
-    navLinks.forEach(link => {
-        const linkPath = link.getAttribute("href");
+// Fungsi untuk menandai menu navigasi aktif
+const setActiveNav = () => {
+    const currentPath = window.location.pathname.split("/").pop() || "index.html";
 
-        if (linkPath === currentPath) {
+    document.querySelectorAll(".nav-links a").forEach(link => {
+        if (link.getAttribute("href") === currentPath) {
             link.classList.add("active");
         }
     });
+};
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Load header dan footer
+    loadPartial("navbar", "partials/navbar.html").then(setActiveNav);
+    loadPartial("footer", "partials/footer.html");
 
     /* ===============================================
-       2. SMOOTH SCROLL (JIKA ADA ANCHOR)
+       1. SMOOTH SCROLL (JIKA ADA ANCHOR)
        Aman meskipun sekarang belum dipakai
     =============================================== */
     const smoothLinks = document.querySelectorAll('a[href^="#"]');
@@ -46,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ===============================================
-       3. SIMPLE FADE-IN ON SCROLL (OPTIONAL)
+       2. SIMPLE FADE-IN ON SCROLL (OPTIONAL)
        Ringan, tanpa library
     =============================================== */
     const revealElements = document.querySelectorAll(".card, .section");
