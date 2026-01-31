@@ -83,3 +83,17 @@ document.addEventListener("DOMContentLoaded", function () {
     revealOnScroll(); // trigger awal
 
 });
+
+// Pendaftaran Service Worker untuk PWA
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js");
+
+        navigator.serviceWorker.addEventListener("message", event => {
+            if (event.data?.type === "SW_UPDATED") {
+                console.log("Service Worker updated — reload");
+                window.location.reload();
+            }
+        });
+    });
+}

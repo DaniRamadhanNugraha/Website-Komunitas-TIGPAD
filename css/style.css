@@ -8,6 +8,7 @@
     --amber: #f5ad05;
     --white: #ffffff;
     --dark: #1a1a1a;
+    --radius: 4px;
 }
 
 * {
@@ -23,12 +24,15 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     color: var(--dark);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 .container {
     width: 90%;
     max-width: 1100px;
     margin: auto;
+    padding-inline: 10px;
 }
 
 /* =========================
@@ -46,7 +50,23 @@ body {
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: var(--white);
+}
+
+.logo-image {
+    border-radius: 75%;
+    max-height: 60px;
+    max-width: 60px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo-image:hover {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px var(--amber));
+    cursor: pointer;
 }
 
 .nav-links {
@@ -65,7 +85,7 @@ body {
     background: var(--amber);
     color: var(--dark);
     padding: 8px 14px;
-    border-radius: 4px;
+    border-radius: var(--radius);
 }
 
 /* =========================
@@ -96,7 +116,7 @@ body {
     display: inline-block;
     padding: 12px 24px;
     margin: 5px;
-    border-radius: 4px;
+    border-radius: var(--radius);
     text-decoration: none;
     font-weight: bold;
 }
@@ -139,7 +159,8 @@ body {
 /* WhatsApp */
 .btn-whatsapp {
     display: inline-block;
-    padding: 12px 22px;
+    padding: 12px 24px;
+    margin: 5px;
     border-radius: var(--radius);
     background-color: #25D366;
     color: #fff;
@@ -154,7 +175,8 @@ body {
 /* Email */
 .btn-email {
     display: inline-block;
-    padding: 12px 22px;
+    padding: 12px 24px;
+    margin: 5px;
     border-radius: var(--radius);
     background-color: #444;
     color: #fff;
@@ -173,7 +195,7 @@ body {
     background: var(--dark);
     color: var(--white);
     text-align: center;
-    padding: 15px;
+    padding: 30px;
 }
 
 /* TENTANG HTML */
@@ -322,7 +344,7 @@ body {
 .card {
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.6s ease;
+    transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
 .section.show,
@@ -336,4 +358,91 @@ body {
 ========================= */
 .nav-links a.active {
     border-bottom: 2px solid var(--amber);
+}
+
+/* RESPONSIVE DEVICE */
+/* =========================
+   RESPONSIVE (MOBILE)
+========================= */
+@media (max-width: 768px) {
+
+    .nav-flex {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links a {
+        padding: 10px;
+        display: block;
+    }
+
+    .btn-nav {
+        display: inline-block;
+        margin-top: 10px;
+    }
+
+    .hero {
+        padding: 70px 20px;
+    }
+
+    .hero h2 {
+        font-size: 1.9rem;
+    }
+
+    .container {
+        width: 95%;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (hover: hover) {
+    .logo-image:hover {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 6px var(--amber));
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-nav:hover,
+    .btn-whatsapp:hover,
+    .btn-email:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-nav,
+.btn-whatsapp,
+.btn-email {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section,
+.card {
+    will-change: transform, opacity;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
 }
