@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/logo2.png">
-    <title>TIGPAD | Open Recruitment Volunteer 2026/2027</title>
+    <title>Komunitas TIGPAD 2026/2027</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
@@ -62,10 +62,21 @@
         <div class="container">
             <h3>Mari Melangkah Bersama</h3>
             <p>Menjadi bagian dari sejarah inklusivitas Universitas Padjadjaran</p>
-            <a href="https://wa.me/6285171744541" class="btn-whatsapp" target="_blank" rel="noopener">
+            <a href="#" class="btn-whatsapp ripple" id="waButton">
                 <i class="fa-brands fa-whatsapp"></i> Whatsapp Resmi</a>
-            <a href="mailto:tigpadunpad25@gmail.com" class="btn-email">
+            <a href="#" class="btn-email ripple" id="emailButton">
                 <i class="fa-solid fa-envelope"></i>Email Resmi</a>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="emailLoader" class="email-loader">
+            <div class="spinner"></div>
+            <span>Membuka email...</span>
+        </div>
+
+        <!-- Fallback Notification -->
+        <div id="emailNotice" class="email-notice">
+            Jika email tidak terbuka, Gmail akan dibuka otomatis.
         </div>
     </section>
 

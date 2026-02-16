@@ -32,14 +32,127 @@ const setActiveNav = () => {
     });
 };
 
+// Jalankan saat DOM siap
 document.addEventListener("DOMContentLoaded", function () {
-
-    // Load header dan footer
+    /* ===============================================
+       1. Load header dan footer
+       Memuat navbar dan footer dari file terpisah untuk kemudahan maintenance
+    =============================================== */
     loadPartial("navbar", "partials/navbar.html").then(setActiveNav);
     loadPartial("footer", "partials/footer.html");
 
     /* ===============================================
-       1. SMOOTH SCROLL (JIKA ADA ANCHOR)
+       2. RIPPLE EFFECT (OPSIONAL) UNTUK TOMBOL
+       Desain modern tanpa library, bisa dipakai untuk tombol lain juga
+    =============================================== */
+    // Ripple Effect
+    document.querySelectorAll(".ripple").forEach(button => {
+        button.addEventListener("click", function (e) {
+            const circle = document.createElement("span");
+            const diameter = Math.max(this.clientWidth, this.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${e.clientX - this.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${e.clientY - this.getBoundingClientRect().top - radius}px`;
+            circle.classList.add("ripple-effect");
+
+            const ripple = this.getElementsByClassName("ripple-effect")[0];
+            if (ripple) {
+                ripple.remove();
+            }
+
+            this.appendChild(circle);
+        });
+    });
+
+    // Interaksi tombol WhatsApp
+    const waBtn = document.getElementById("waButton");
+
+    waBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const phone = "6285171744541"; // https://wa.me/6285171744541
+        const message = "Halo Tim TIGPAD, saya ingin bertanya mengenai ...";
+        const encodedMessage = encodeURIComponent(message);
+
+        const waAppLink = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
+        const waWebLink = `https://wa.me/${phone}?text=${encodedMessage}`;
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        // Tampilkan loader
+        loader.classList.add("show");
+
+        if (isMobile) {
+            // Coba buka WhatsApp App
+            window.location.href = waAppLink;
+        } else {
+            // Desktop langsung ke WA Web
+            window.open(waWebLink, "_blank");
+        }
+
+        // Fallback (jika mobile gagal buka app)
+        setTimeout(function () {
+            loader.classList.remove("show");
+
+            if (isMobile) {
+                notice.textContent = "Jika WhatsApp tidak terbuka, WhatsApp Web akan dibuka.";
+                notice.classList.add("show");
+                window.open(waWebLink, "_blank");
+
+                setTimeout(() => {
+                    notice.classList.remove("show");
+                }, 4000);
+            }
+        }, 1800);
+    });
+
+    // Interaksi tombol email
+    const emailBtn = document.getElementById("emailButton");
+    const loader = document.getElementById("emailLoader");
+    const notice = document.getElementById("emailNotice");
+
+    emailBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const email = "tigpadunpad25@gmail.com";
+        const subject = "Komunitas TIGPAD - Pertanyaan";
+        const body = "Halo Tim TIGPAD,\n\nSaya ingin bertanya mengenai ...";
+
+        const encodedSubject = encodeURIComponent(subject);
+        const encodedBody = encodeURIComponent(body);
+
+        const mailtoLink = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
+        const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodedSubject}&body=${encodedBody}`;
+
+        // Deteksi mobile 
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        // Tampilkan loader
+        loader.classList.add("show");
+
+        // Coba buka mailto
+        window.location.href = mailtoLink;
+
+        // Fallback / Jika tidak terjadi apa-apa dalam beberapa detik → buka Gmail
+        setTimeout(function () {
+            loader.classList.remove("show");
+
+            // Jika desktop, buka Gmail sebagai fallback
+            if (!isMobile) {
+                notice.classList.add("show");
+                window.open(gmailLink, "_blank");
+
+                setTimeout(() => {
+                    notice.classList.remove("show");
+                }, 4000);
+            }
+        }, 1800);
+    });
+
+    /* ===============================================
+       3. SMOOTH SCROLL (JIKA ADA ANCHOR)
        Aman meskipun sekarang belum dipakai
     =============================================== */
     const smoothLinks = document.querySelectorAll('a[href^="#"]');
@@ -60,9 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-
     /* ===============================================
-       2. SIMPLE FADE-IN ON SCROLL (OPTIONAL)
+       4. SIMPLE FADE-IN ON SCROLL (OPTIONAL)
        Ringan, tanpa library
     =============================================== */
     const revealElements = document.querySelectorAll(".card, .section");
