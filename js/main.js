@@ -42,7 +42,28 @@ document.addEventListener("DOMContentLoaded", function () {
     loadPartial("footer", "partials/footer.html");
 
     /* ===============================================
-       2. RIPPLE EFFECT (OPSIONAL) UNTUK TOMBOL
+       2. FADE-IN DENGAN INTERSECTION OBSERVER (MODERN)
+       Lebih hemat performa dibanding scroll event
+    =============================================== */
+    const revealElements = document.querySelectorAll(".card, .section");
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("show");
+                observer.unobserve(entry.target); // Animasi hanya sekali
+            }
+        });
+    }, {
+        threshold: 0.1 // Muncul saat 10% terlihat
+    });
+
+    revealElements.forEach(el => {
+        observer.observe(el);
+    });
+
+    /* ===============================================
+       3. RIPPLE EFFECT (OPSIONAL) UNTUK TOMBOL
        Desain modern tanpa library, bisa dipakai untuk tombol lain juga
     =============================================== */
     // Ripple Effect
@@ -69,90 +90,94 @@ document.addEventListener("DOMContentLoaded", function () {
     // Interaksi tombol WhatsApp
     const waBtn = document.getElementById("waButton");
 
-    waBtn.addEventListener("click", function (e) {
-        e.preventDefault();
+    if (waBtn) {
+        waBtn.addEventListener("click", function (e) {
+            e.preventDefault();
 
-        const phone = "6285171744541"; // https://wa.me/6285171744541
-        const message = "Halo Tim TIGPAD, saya ingin bertanya mengenai ...";
-        const encodedMessage = encodeURIComponent(message);
+            const phone = "6285171744541"; // https://wa.me/6285171744541
+            const message = "Halo Tim TIGPAD, saya ingin bertanya mengenai ...";
+            const encodedMessage = encodeURIComponent(message);
 
-        const waAppLink = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
-        const waWebLink = `https://wa.me/${phone}?text=${encodedMessage}`;
+            const waAppLink = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
+            const waWebLink = `https://wa.me/${phone}?text=${encodedMessage}`;
 
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        // Tampilkan loader
-        loader.classList.add("show");
-
-        if (isMobile) {
-            // Coba buka WhatsApp App
-            window.location.href = waAppLink;
-        } else {
-            // Desktop langsung ke WA Web
-            window.open(waWebLink, "_blank");
-        }
-
-        // Fallback (jika mobile gagal buka app)
-        setTimeout(function () {
-            loader.classList.remove("show");
+            // Tampilkan loader
+            loader.classList.add("show");
 
             if (isMobile) {
-                notice.textContent = "Jika WhatsApp tidak terbuka, WhatsApp Web akan dibuka.";
-                notice.classList.add("show");
+                // Coba buka WhatsApp App
+                window.location.href = waAppLink;
+            } else {
+                // Desktop langsung ke WA Web
                 window.open(waWebLink, "_blank");
-
-                setTimeout(() => {
-                    notice.classList.remove("show");
-                }, 4000);
             }
-        }, 1800);
-    });
+
+            // Fallback (jika mobile gagal buka app)
+            setTimeout(function () {
+                loader.classList.remove("show");
+
+                if (isMobile) {
+                    notice.textContent = "Jika WhatsApp tidak terbuka, WhatsApp Web akan dibuka.";
+                    notice.classList.add("show");
+                    window.open(waWebLink, "_blank");
+
+                    setTimeout(() => {
+                        notice.classList.remove("show");
+                    }, 4000);
+                }
+            }, 1800);
+        });
+    }
 
     // Interaksi tombol email
     const emailBtn = document.getElementById("emailButton");
     const loader = document.getElementById("emailLoader");
     const notice = document.getElementById("emailNotice");
 
-    emailBtn.addEventListener("click", function (e) {
-        e.preventDefault();
+    if (emailBtn) {
+        emailBtn.addEventListener("click", function (e) {
+            e.preventDefault();
 
-        const email = "tigpadunpad25@gmail.com";
-        const subject = "Komunitas TIGPAD - Pertanyaan";
-        const body = "Halo Tim TIGPAD,\n\nSaya ingin bertanya mengenai ...";
+            const email = "tigpadunpad25@gmail.com";
+            const subject = "Komunitas TIGPAD - Pertanyaan";
+            const body = "Halo Tim TIGPAD,\n\nSaya ingin bertanya mengenai ...";
 
-        const encodedSubject = encodeURIComponent(subject);
-        const encodedBody = encodeURIComponent(body);
+            const encodedSubject = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
 
-        const mailtoLink = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
-        const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodedSubject}&body=${encodedBody}`;
+            const mailtoLink = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
+            const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodedSubject}&body=${encodedBody}`;
 
-        // Deteksi mobile 
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            // Deteksi mobile 
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        // Tampilkan loader
-        loader.classList.add("show");
+            // Tampilkan loader
+            loader.classList.add("show");
 
-        // Coba buka mailto
-        window.location.href = mailtoLink;
+            // Coba buka mailto
+            window.location.href = mailtoLink;
 
-        // Fallback / Jika tidak terjadi apa-apa dalam beberapa detik → buka Gmail
-        setTimeout(function () {
-            loader.classList.remove("show");
+            // Fallback / Jika tidak terjadi apa-apa dalam beberapa detik → buka Gmail
+            setTimeout(function () {
+                loader.classList.remove("show");
 
-            // Jika desktop, buka Gmail sebagai fallback
-            if (!isMobile) {
-                notice.classList.add("show");
-                window.open(gmailLink, "_blank");
+                // Jika desktop, buka Gmail sebagai fallback
+                if (!isMobile) {
+                    notice.classList.add("show");
+                    window.open(gmailLink, "_blank");
 
-                setTimeout(() => {
-                    notice.classList.remove("show");
-                }, 4000);
-            }
-        }, 1800);
-    });
+                    setTimeout(() => {
+                        notice.classList.remove("show");
+                    }, 4000);
+                }
+            }, 1800);
+        });
+    }
 
     /* ===============================================
-       3. SMOOTH SCROLL (JIKA ADA ANCHOR)
+       4. SMOOTH SCROLL (JIKA ADA ANCHOR)
        Aman meskipun sekarang belum dipakai
     =============================================== */
     const smoothLinks = document.querySelectorAll('a[href^="#"]');
@@ -172,27 +197,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
-
-    /* ===============================================
-       4. SIMPLE FADE-IN ON SCROLL (OPTIONAL)
-       Ringan, tanpa library
-    =============================================== */
-    const revealElements = document.querySelectorAll(".card, .section");
-
-    const revealOnScroll = () => {
-        const windowHeight = window.innerHeight;
-
-        revealElements.forEach(el => {
-            const elementTop = el.getBoundingClientRect().top;
-
-            if (elementTop < windowHeight - 100) {
-                el.classList.add("show");
-            }
-        });
-    };
-
-    window.addEventListener("scroll", revealOnScroll);
-    revealOnScroll(); // trigger awal
 
 });
 
