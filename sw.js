@@ -1,17 +1,16 @@
-const CACHE_NAME = "tigpad-cache-v2";
-const STATIC_CACHE = "tigpad-static-v2";
+const CACHE_NAME = "tigpad-cache-v4";
 
 const STATIC_ASSETS = [
-    "/",
-    "/index.html",
-    "/tentang.html",
-    "/profile.html",
-    "/pendaftaran.html",
-    "/divisi.html",
-    "/assets/css/style.css",
-    "/assets/js/main.js",
-    "/assets/img/logo2.png",
-    "/favicon.ico"
+    "./",
+    "./index.html",
+    "./tentang.html",
+    "./profile.html",
+    "./pendaftaran.html",
+    "./divisi.html",
+    "./assets/css/style.css",
+    "./assets/js/main.js",
+    "./assets/img/logo2.png",
+    "./favicon.ico"
 ];
 
 // =========================
@@ -19,8 +18,9 @@ const STATIC_ASSETS = [
 // =========================
 self.addEventListener("install", event => {
     event.waitUntil(
-        caches.open(STATIC_CACHE).then(cache =>
-            cache.addAll(STATIC_ASSETS))
+        caches.open(CACHE_NAME).then(cache =>
+            Promise.allSettled(STATIC_ASSETS.map(asset => cache.add(asset)))
+        )
     );
     self.skipWaiting();
 });
@@ -33,7 +33,7 @@ self.addEventListener("activate", event => {
         caches.keys().then(keys =>
             Promise.all(
                 keys
-                    .filter(key => key !== CACHE_NAME && key !== STATIC_CACHE)
+                    .filter(key => key !== CACHE_NAME)
                     .map(key => caches.delete(key))
             )
         )
@@ -78,7 +78,7 @@ async function networkFirst(request) {
         cache.put(request, fresh.clone());
         return fresh;
     } catch {
-        return await caches.match(request) || caches.match("/index.html");
+        return await caches.match(request) || caches.match("./index.html");
     }
 }
 

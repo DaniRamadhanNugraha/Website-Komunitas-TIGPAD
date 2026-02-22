@@ -26,13 +26,76 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
 }
 
 .container {
-    width: 90%;
-    max-width: 1100px;
+    width: 100%;
+    max-width: 1200px;
     margin: auto;
-    padding-inline: 10px;
+    padding-inline: clamp(16px, 4vw, 32px);
+}
+
+html {
+    font-size: clamp(14px, 1.5vw, 16px);
+    scroll-behavior: smooth;
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   TYPHOGRAPHY SYSTEM
+========================= */
+h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+}
+
+h2 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+}
+
+h3 {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+}
+
+p {
+    font-size: 1rem;
+}
+
+/* =========================
+   NAV TOGGLE (HAMBURGER)
+========================= */
+.nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    width: 24px;
+    height: 3px;
+    background: var(--white);
+    transition: all 0.3s ease;
+}
+
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(8px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translateY(-8px);
 }
 
 /* =========================
@@ -41,12 +104,15 @@ body {
 .navbar {
     background: var(--maroon);
     padding: 15px 0;
+    height: 90px;
 }
 
 .nav-flex {
     display: flex;
-    justify-content: space-between;
+    gap: 20px;
     align-items: center;
+    position: relative;
+    height: 100%;
 }
 
 .logo {
@@ -63,6 +129,12 @@ body {
     transition: transform 0.3s ease, filter 0.3s ease;
 }
 
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .logo-image:hover {
     transform: scale(1.15);
     filter: drop-shadow(0 0 6px var(--amber));
@@ -71,14 +143,43 @@ body {
 
 .nav-links {
     list-style: none;
-    display: flex;
+    display: none;
+    flex-direction: column;
     gap: 20px;
+
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 75%;
+    max-width: 300px;
+
+    background: var(--maroon);
+    padding: 80px 20px 20px;
+    margin-left: auto;
+    z-index: 9999;
+
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.nav-links.active {
+    display: flex;
+    transform: translateX(0);
 }
 
 .nav-links a {
     color: var(--white);
     text-decoration: none;
     font-weight: bold;
+}
+
+.nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
 }
 
 .btn-nav {
@@ -92,19 +193,72 @@ body {
    HERO
 ========================= */
 .hero {
-    background: linear-gradient(rgba(85, 8, 3, 0.85),
-            rgba(85, 8, 3, 0.85));
+    position: relative;
+    background: linear-gradient(135deg,
+            var(--maroon), #2b0603);
     color: var(--white);
-    padding: 6rem 0;
+    padding-block: clamp(2rem, 8vw, 4rem);
     text-align: center;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin-inline: auto;
+
+    opacity: 1;
+    transform: translateY(0);
+    animation: heroFade 1s ease forwards;
+}
+
+@keyframes heroFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero h2 {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(245, 173, 5, 0.35), transparent 70%);
+    top: -150px;
+    right: -150px;
+    z-index: 0;
+    animation: floatGlow 6s ease-in-out infinite alternate;
+}
+
+@keyframes floatGlow {
+    from {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(20px);
+    }
 }
 
 .subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    opacity: 0.9;
     margin: 20px 0;
+    margin-bottom: 2rem;
 }
 
 .hero-buttons {
@@ -112,13 +266,20 @@ body {
 }
 
 .btn-primary,
-.btn-secondary {
-    display: inline-block;
+.btn-secondary,
+.btn-nav,
+.btn-whatsapp,
+.btn-email {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
     padding: 12px 24px;
     margin: 5px;
     border-radius: var(--radius);
     text-decoration: none;
     font-weight: bold;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-primary {
@@ -129,6 +290,8 @@ body {
 .btn-secondary {
     border: 2px solid var(--white);
     color: var(--white);
+    backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* =========================
@@ -162,8 +325,9 @@ body {
     padding: 12px 24px;
     margin: 5px;
     border-radius: var(--radius);
-    background-color: #25D366;
+    background-color: #075E54;
     color: #fff;
+    opacity: 1;
     font-weight: bold;
     text-decoration: none;
 }
@@ -427,6 +591,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease, transform 0.6s ease;
+    will-change: transform, opacity;
 }
 
 .section.show,
@@ -452,7 +617,6 @@ body {
     }
 
     .nav-flex {
-        flex-direction: column;
         gap: 15px;
     }
 
@@ -502,6 +666,26 @@ body {
     }
 }
 
+@media (min-width: 768px) {
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 20px;
+        position: static;
+        width: auto;
+        max-width: 100%;
+        background: none;
+        padding: 0;
+        align-items: center;
+        justify-content: flex-start;
+    }
+}
+
 @media (max-width: 600px) {
 
     .grid-2,
@@ -526,25 +710,10 @@ body {
     }
 }
 
-.btn-primary,
-.btn-secondary,
-.btn-nav,
-.btn-whatsapp,
-.btn-email {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+@media (prefers-reduced-motion: reduce) {
 
-.section,
-.card {
-    will-change: transform, opacity;
-}
-
-html {
-    font-size: clamp(14px, 1.5vw, 16px);
-    scroll-behavior: smooth;
-}
-
-a,
-button {
-    -webkit-tap-highlight-color: transparent;
+    .hero-content,
+    .hero::before {
+        animation: none;
+    }
 }

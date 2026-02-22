@@ -23,23 +23,85 @@ const loadPartial = async (id, file) => {
 
 // Fungsi untuk menandai menu navigasi aktif
 const setActiveNav = () => {
-    const currentPath = window.location.pathname.split("/").pop() || "index.html";
+    const currentURL = new URL(window.location.href);
+    let currentPage = window.location.pathname
+        .split("/")
+        .pop()
+        .split("?")[0] // Hapus query string
+
+    // Jika URL berakhir dengan "/" → anggap index.html
+    if (!currentPage || currentPage === "") {
+        currentPage = "index.html";
+    }
 
     document.querySelectorAll(".nav-links a").forEach(link => {
-        if (link.getAttribute("href") === currentPath) {
-            link.classList.add("active");
-        }
+        // Cek dengan href yang sudah diproses (tanpa "./" dan query string)
+        const linkPage = link.getAttribute("href")
+            .replace("./", "") // Hapus prefix jika ada
+            .split("?")[0]; // Hapus query string
+        link.classList.toggle("active", linkPage === currentPage);
     });
 };
 
 // Jalankan saat DOM siap
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    // Konstanta untuk elemen loader dan notice email (digunakan di beberapa tempat)
+    const loader = document.getElementById("emailLoader");
+    const notice = document.getElementById("emailNotice");
+
     /* ===============================================
        1. Load header dan footer
        Memuat navbar dan footer dari file terpisah untuk kemudahan maintenance
     =============================================== */
-    loadPartial("navbar", "partials/navbar.html").then(setActiveNav);
-    loadPartial("footer", "partials/footer.html");
+    await loadPartial("navbar", "partials/navbar.html").then(() => {
+        setActiveNav();
+
+        const navToggle = document.querySelector('.nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (navToggle && navLinks) {
+            let overlay;
+
+            navToggle.addEventListener('click', () => {
+                const isOpen = navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+                navToggle.setAttribute('aria-expanded', isOpen);
+
+                if (isOpen) {
+                    overlay = document.createElement('div');
+                    overlay.classList.add('nav-overlay');
+                    document.body.appendChild(overlay);
+
+                    overlay.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        navToggle.classList.remove('active');
+                        overlay.remove();
+                    });
+                } else {
+                    overlay?.remove();
+                }
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (navToggle && navLinks) {
+                if (!navToggle.contains(e.target) &&
+                    !navLinks.contains(e.target)) {
+
+                    navLinks.classList.remove('active');
+                    navToggle.classList.remove('active');
+                }
+            }
+        });
+    });
+    await loadPartial("footer", "partials/footer.html");
 
     /* ===============================================
        2. FADE-IN DENGAN INTERSECTION OBSERVER (MODERN)
@@ -133,8 +195,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Interaksi tombol email
     const emailBtn = document.getElementById("emailButton");
-    const loader = document.getElementById("emailLoader");
-    const notice = document.getElementById("emailNotice");
 
     if (emailBtn) {
         emailBtn.addEventListener("click", function (e) {
@@ -203,7 +263,9 @@ document.addEventListener("DOMContentLoaded", function () {
 // Pendaftaran Service Worker untuk PWA
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js");
+        navigator.serviceWorker.register("sw.js")
+            .then(reg => console.log("SW registered"))
+            .catch(err => console.log("SW gagal:", err));
 
         navigator.serviceWorker.addEventListener("message", event => {
             if (event.data?.type === "SW_UPDATED") {
